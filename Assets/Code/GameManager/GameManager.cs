@@ -48,9 +48,12 @@ namespace Game.Assets
                 map.SetData(position2, TileAtlas.Mountain);
             }
 
-            LevelData = new LevelData(map);
+            var pawn = (Pawn)PawnAtlas.Morty.Clone();
+            pawn.X = 1;
+            pawn.Y = 1;
+            map.AddAgent(pawn);
 
-            LevelData.Pawn = PawnAtlas.Morty;
+            LevelData = new LevelData(map);
 
             LoadLevel();
         }

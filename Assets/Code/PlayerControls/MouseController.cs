@@ -11,20 +11,32 @@ namespace Game.Assets
     {
         public GameObject HighlightPrefab;
 
-        public GameObject HighlightObject;
+        public GameObject CursorHighlight;
+        public GameObject UnitHighlight;
 
-        public Action<NodeData> OnTerrainChange;
+        public Action<NodeData>     OnTerrainChange;
+        public Action<Pawn>         OnPawnChange;
+        public Action<Pawn>         OnSelectedChange;
+
+        protected Pawn _selectedUnit;
+        protected Pawn _highlightedPawn;
+        protected NodeData _highlightedTerrain;
+        protected Action<Point, Pawn, NodeData> _state;
 
         protected Point _previousPoint = new Point(-1, -1);
 
         private void Awake()
         {
-            HighlightObject = GameObject.Instantiate(HighlightPrefab, Vector3.zero, Quaternion.identity);
+            CursorHighlight = GameObject.Instantiate(HighlightPrefab, Vector3.zero, Quaternion.identity);
+            UnitHighlight = GameObject.Instantiate(HighlightPrefab, Vector3.zero, Quaternion.identity);
+            _state = State_NoUnitSelected;
         }
 
         private void Start()
         {
             OnTerrainChange += UIController.Instance.SetTerrainData;
+            OnPawnChange += UIController.Instance.SetPawnData;
+            OnSelectedChange += UIController.Instance.SetSelectedPawn;
         }
 
         private void Update()
@@ -38,30 +50,58 @@ namespace Game.Assets
             if (point.X != _previousPoint.X || point.Y != _previousPoint.Y)
             {
                 _previousPoint = point;
-                NodeData terrainData = null;
-
                 if (isOnMap)
                 {
-                    HighlightObject.transform.position = new Vector3(point.X, point.Y, -1.0f);
-                    terrainData = map.GetData(point);
+                    CursorHighlight.transform.position = new Vector3(point.X, point.Y, -1.0f);
+                    _highlightedTerrain = map.GetData(point);
+
+                    var pawns = map.GetAgent(point);
+                    _highlightedPawn = pawns.Count > 0 ? (Pawn)pawns[0] : null;
                 }
 
-                HighlightObject.SetActive(isOnMap);
-                OnTerrainChange?.Invoke(terrainData);
+                CursorHighlight.SetActive(isOnMap);
+                OnTerrainChange?.Invoke(_highlightedTerrain);
+                OnPawnChange?.Invoke(_highlightedPawn);
             }
 
             if (isOnMap)
             {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    var pawn = GameManager.Instance.Board.Pawn;
-                    var pawnComponent = GameManager.Instance.Board.ComponentForPawn(pawn);
-                    var start = new Point((int)pawnComponent.transform.position.x, (int)pawnComponent.transform.position.y);
-                    var path = map.GetPath(start, point, pawn);
+                _state(point, _highlightedPawn, _highlightedTerrain);
+            }
+        }
 
-                    path.Reverse();
-                    pawnComponent.Move(path.Select(node => new Vector2(node.X, node.Y)).ToList());
+        protected void State_NoUnitSelected(Point point, Pawn pawn, NodeData nodeData)
+        {
+            var map = GameManager.Instance.LevelData.Map;
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                if(pawn != null)
+                {
+                    _selectedUnit = pawn;
+                    _state = State_UnitSelected;
+                    OnSelectedChange?.Invoke(_selectedUnit);
                 }
+            }
+        }
+
+        protected void State_UnitSelected(Point point, Pawn pawn, NodeData nodeData)
+        {
+            var map = GameManager.Instance.LevelData.Map;
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                var pawnComponent = _selectedUnit.PawnComponent;
+                var start = new Point((int)pawnComponent.transform.position.x, (int)pawnComponent.transform.position.y);
+                var path = map.GetPath(start, point, _selectedUnit);
+                _selectedUnit.X = point.X;
+                _selectedUnit.Y = point.Y;
+
+                pawnComponent.Move(path.Select(node => new Vector2(node.X, node.Y)).ToList());
+
+                _selectedUnit = null;
+                _state = State_NoUnitSelected;
+                OnSelectedChange?.Invoke(_selectedUnit);
             }
         }
     }

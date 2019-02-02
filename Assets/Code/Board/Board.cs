@@ -11,9 +11,6 @@ namespace Game.Assets
         protected Map<NodeData> _map;
 
         protected Dictionary<Node<NodeData>, GameObject> _nodesToGameObejcts = new Dictionary<Node<NodeData>, GameObject>();
-        protected Dictionary<Pawn, PawnComponent> _pawnsToGameObjects = new Dictionary<Pawn, PawnComponent>();
-
-        public Pawn Pawn;
 
         private void Awake()
         {
@@ -27,18 +24,14 @@ namespace Game.Assets
                 _nodesToGameObejcts.Add(node, nodeObject);
             });
 
-            var pawn = GameManager.Instance.LevelData.Pawn;
-            var pawnObject = GameObject.Instantiate(pawn.Prefab, Vector2.zero, Quaternion.identity);
-            var pawnComponent = pawnObject.GetComponent<PawnComponent>();
-
-            _pawnsToGameObjects.Add(pawn, pawnComponent);
-
-            Pawn = pawn;
-        }
-
-        public PawnComponent ComponentForPawn(Pawn pawn)
-        {
-            return _pawnsToGameObjects[pawn];
+            _map.GetAgents().ForEach(agent =>
+            {
+                var pawn = (Pawn)agent;
+                var position = new Vector2(pawn.X, pawn.Y);
+                var pawnObject = GameObject.Instantiate(pawn.Prefab, position, Quaternion.identity);
+                var pawnComponent = pawnObject.GetComponent<PawnComponent>();
+                pawn.PawnComponent = pawnComponent;
+            });
         }
     }
 }

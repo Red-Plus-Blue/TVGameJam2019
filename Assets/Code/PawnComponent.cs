@@ -18,7 +18,7 @@ namespace Game.Assets
 
         public IEnumerator Move_Coroutine(List<Vector2> path)
         {
-            while (path.Count > 1)
+            while (path.Count > 0)
             {
                 var target = path[0];
 

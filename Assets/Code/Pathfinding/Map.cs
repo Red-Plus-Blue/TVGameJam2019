@@ -8,6 +8,7 @@ namespace Game.Pathfinding
     public class Map<T>
     {
         protected Node<T>[,] _nodes = new Node<T>[1, 1];
+        protected List<Agent<T>> _agents = new List<Agent<T>>();
 
         public int MaxX { get; } = 1;
         public int MaxY { get; } = 1;
@@ -33,6 +34,21 @@ namespace Game.Pathfinding
         public bool IsOnMap(Point point)
         {
             return (point.X >= 0) && (point.X < MaxX) && (point.Y >= 0) && (point.Y < MaxY);
+        }
+
+        public void AddAgent(Agent<T> agent)
+        {
+            _agents.Add(agent);
+        }
+
+        public List<Agent<T>> GetAgent(Point point)
+        {
+            return _agents.Where(agent => { return (agent.X == point.X) && (agent.Y == point.Y); }).ToList();
+        }
+
+        public List<Agent<T>> GetAgents()
+        {
+            return _agents;
         }
 
         public List<Node<T>> GetNodes()
@@ -114,8 +130,13 @@ namespace Game.Pathfinding
                 return (float)Math.Sqrt((xDifference * xDifference) + (yDifference * yDifference));
             }
 
-            var start = _nodes[from.X, from.Y];
-            var goal = _nodes[to.X, to.Y];
+            var start = _nodes[to.X, to.Y];
+            var goal = _nodes[from.X, from.Y];
+
+            if (agent.CanEnter(start) == false)
+            {
+                throw new NoPathException();
+            }
 
             var closedSet   = new List<Node<T>>();
             var openSet     = new List<Node<T>>();

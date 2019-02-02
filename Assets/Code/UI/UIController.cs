@@ -12,6 +12,7 @@ namespace Game.Assets
 
         public Text TerrainText;
         public Text PawnText;
+        public Text SelectedText;
 
         private void Awake()
         {
@@ -20,7 +21,7 @@ namespace Game.Assets
 
         public void SetPawnData(Pawn pawn)
         {
-
+            PawnText.text = GetPawnDescription(pawn);
         }
 
         public void SetTerrainData(NodeData data)
@@ -37,6 +38,22 @@ namespace Game.Assets
                 data.Prefab.name,
                 data.Walkable
             );
+        }
+
+        public void SetSelectedPawn(Pawn pawn)
+        {
+            SelectedText.text = GetPawnDescription(pawn);
+        }
+
+        protected string GetPawnDescription(Pawn pawn)
+        {
+            if (pawn == null)
+            {
+                return "";
+            }
+
+            var description = pawn.Name;
+            return description;
         }
 
     }

@@ -9,7 +9,6 @@ namespace Game.Assets
     public class LevelData
     {
         public Map<NodeData> Map { get; set; }
-        public Pawn Pawn { get; set; }
         
         public LevelData(Map<NodeData> map)
         {
