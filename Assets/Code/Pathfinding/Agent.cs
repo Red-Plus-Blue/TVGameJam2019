@@ -5,8 +5,11 @@ using System.Collections.Generic;
 
 namespace Game.Pathfinding
 {
-    public class Agent
+    public class Agent<T>
     {
-
+        public virtual bool CanEnter(Node<T> node)
+        {
+            return true;
+        }
     }
 }

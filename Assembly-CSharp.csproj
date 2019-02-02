@@ -57,12 +57,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Code\PathfindingTester.cs" />
+    <Compile Include="Assets\Code\Board\Board.cs" />
+    <Compile Include="Assets\Code\Board\LevelData.cs" />
+    <Compile Include="Assets\Code\Board\PawnAtlas.cs" />
+    <Compile Include="Assets\Code\Board\TileAtlas.cs" />
+    <Compile Include="Assets\Code\PawnComponent.cs" />
+    <Compile Include="Assets\Code\PlayerControls\CameraController.cs" />
+    <Compile Include="Assets\Code\GameManager\GameManager.cs" />
+    <Compile Include="Assets\Code\NodeData\NodeData.cs" />
     <Compile Include="Assets\Code\Pathfinding\Agent.cs" />
     <Compile Include="Assets\Code\Pathfinding\Map.cs" />
     <Compile Include="Assets\Code\Pathfinding\Node.cs" />
     <Compile Include="Assets\Code\Pathfinding\NoPathException.cs" />
     <Compile Include="Assets\Code\Pathfinding\Point.cs" />
+    <Compile Include="Assets\Code\PathfindingTester.cs" />
+    <Compile Include="Assets\Code\Pawn\Pawn.cs" />
+    <Compile Include="Assets\Code\PlayerControls\MouseController.cs" />
+    <Compile Include="Assets\Code\UI\UIController.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/kylea/Desktop/TVGameJam2019/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
@@ -631,6 +642,7 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.0a14/Editor/Data/NetStandard/compat/2.0.0/shims/netfx/System.Xml.Serialization.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

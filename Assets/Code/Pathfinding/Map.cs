@@ -9,10 +9,10 @@ namespace Game.Pathfinding
     {
         protected Node<T>[,] _nodes = new Node<T>[1, 1];
 
-        public int MaxX { get; }  = 1;
+        public int MaxX { get; } = 1;
         public int MaxY { get; } = 1;
 
-        public Map(int maxX, int maxY)
+        public Map(int maxX, int maxY, T fill)
         {
             MaxX = maxX;
             MaxY = maxY;
@@ -24,9 +24,25 @@ namespace Game.Pathfinding
                 {
                  
                     var node = new Node<T>(x, y);
+                    node.Data = fill;
                     _nodes[x, y] = node;
                 }
             }
+        }
+
+        public bool IsOnMap(Point point)
+        {
+            return (point.X >= 0) && (point.X < MaxX) && (point.Y >= 0) && (point.Y < MaxY);
+        }
+
+        public List<Node<T>> GetNodes()
+        {
+            var list = new List<Node<T>>();
+            foreach(var node in _nodes)
+            {
+                list.Add(node);
+            }
+            return list;
         }
 
         public void SetData(Point position, T data)
@@ -89,7 +105,7 @@ namespace Game.Pathfinding
             return neighbors;
         }
 
-        public List<Node<T>> GetPath(Point from, Point to, Action<String> log)
+        public List<Node<T>> GetPath(Point from, Point to, Agent<T> agent)
         {
             float Distance(int x1, int y1, int x2, int y2)
             {
@@ -110,14 +126,8 @@ namespace Game.Pathfinding
 
             while (openSet.Count > 0)
             {
-                log("---------- Iteration ----------");
-
                 var minFScore   = openSet.Min(node => metaData[node].f);
                 var current     = openSet.First(node => metaData[node].f == minFScore);
-
-                log("Open Set Size: " + openSet.Count);
-                log("Min F:" + minFScore);
-                log("Current: " + current.ToString());
 
                 if (current == goal)
                 {
@@ -129,15 +139,15 @@ namespace Game.Pathfinding
 
                 var neighbors = GetNeighbors(current);
 
-                log("Neighbors: " + neighbors.Count);
-
                 neighbors.ForEach(neighbor =>
                 {
-                    log(">>>> Neighbor(" + neighbor.X + "," + neighbor.Y + "):");
+                    if(agent.CanEnter(neighbor) == false)
+                    {
+                        closedSet.Add(neighbor);
+                    }
 
                     if (closedSet.Contains(neighbor))
                     {
-                        log("     *In closed set");
                         return;
                     }
                     var g = metaData[current].g + Distance(current.X, current.Y, neighbor.X, neighbor.Y);
@@ -147,11 +157,9 @@ namespace Game.Pathfinding
                     }
                     else if(g > metaData[neighbor].g)
                     {
-                        log("     *g score too high");
                         return;
                     }
                     metaData[neighbor] = (cameFrom: current, g: g, f: g + GetCost(neighbor, goal));
-                    log("     Added (g: " + metaData[neighbor].g + ",f: " + metaData[neighbor].f + ")");
                 });
             }
 
