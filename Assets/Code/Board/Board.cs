@@ -12,6 +12,8 @@ namespace Game.Assets
 
         protected Dictionary<Node<NodeData>, GameObject> _nodesToGameObejcts = new Dictionary<Node<NodeData>, GameObject>();
 
+        protected TurnManager _turnManager;
+
         private void Awake()
         {
             GameManager.Instance.Board = this;
@@ -32,6 +34,15 @@ namespace Game.Assets
                 var pawnComponent = pawnObject.GetComponent<PawnComponent>();
                 pawn.PawnComponent = pawnComponent;
             });
+        }
+
+        private void Start()
+        {
+            var players = GameManager.Instance.LevelData.Players;
+            _turnManager = new TurnManager(players);
+            _turnManager.OnRoundStart = (round, callback) => { Debug.Log("Starting round: " + round); callback(); };
+            _turnManager.OnTurnStart = (player, callback) => { Debug.Log("It is " + player.Name + "'s turn"); callback(); };
+            _turnManager.NextRound();
         }
     }
 }

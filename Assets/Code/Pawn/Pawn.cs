@@ -10,6 +10,7 @@ namespace Game.Assets
         public String Name;
         public GameObject Prefab;
         public PawnComponent PawnComponent { get; set; }
+        public Player Owner { get; set; }
 
         public override bool CanEnter(Node<NodeData> node)
         {

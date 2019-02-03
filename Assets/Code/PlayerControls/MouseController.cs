@@ -22,6 +22,7 @@ namespace Game.Assets
         protected Pawn _highlightedPawn;
         protected NodeData _highlightedTerrain;
         protected Action<Point, Pawn, NodeData> _state;
+        protected Player _owner;
 
         protected Point _previousPoint = new Point(-1, -1);
 
@@ -37,10 +38,16 @@ namespace Game.Assets
             OnTerrainChange += UIController.Instance.SetTerrainData;
             OnPawnChange += UIController.Instance.SetPawnData;
             OnSelectedChange += UIController.Instance.SetSelectedPawn;
+            _owner = GameManager.Instance.LevelData.Players.Where(player => player.IsHuman).First();
         }
 
         private void Update()
         {
+            if(Input.GetMouseButtonDown(1))
+            {
+                _owner.EndTurn();
+            }
+
             var hoverPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var point = new Point((int)Mathf.Round(hoverPosition.x), (int)Mathf.Round(hoverPosition.y));
 
@@ -57,10 +64,15 @@ namespace Game.Assets
 
                     var pawns = map.GetAgent(point);
                     _highlightedPawn = pawns.Count > 0 ? (Pawn)pawns[0] : null;
+
+                    OnTerrainChange?.Invoke(_highlightedTerrain);
+                }
+                else
+                {
+                    OnTerrainChange?.Invoke(null);
                 }
 
                 CursorHighlight.SetActive(isOnMap);
-                OnTerrainChange?.Invoke(_highlightedTerrain);
                 OnPawnChange?.Invoke(_highlightedPawn);
             }
 
@@ -76,7 +88,7 @@ namespace Game.Assets
 
             if (Input.GetMouseButtonDown(0))
             {
-                if(pawn != null)
+                if (pawn != null && pawn.Owner == _owner)
                 {
                     _selectedUnit = pawn;
                     _state = State_UnitSelected;

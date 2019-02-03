@@ -23,6 +23,8 @@ namespace Game.Assets
         public TileAtlas TileAtlas;
         public PawnAtlas PawnAtlas;
 
+        public User User = new User();
+
         private void Awake()
         {
             if(Instance != null)
@@ -35,7 +37,7 @@ namespace Game.Assets
             GameObject.DontDestroyOnLoad(gameObject);
         }
 
-        private void Start()
+        public void StartLevel()
         {
             var map = new Map<NodeData>(10, 10, TileAtlas.Grass);
 
@@ -48,18 +50,45 @@ namespace Game.Assets
                 map.SetData(position2, TileAtlas.Mountain);
             }
 
-            var pawn = (Pawn)PawnAtlas.Morty.Clone();
-            pawn.X = 1;
-            pawn.Y = 1;
-            map.AddAgent(pawn);
-
             LevelData = new LevelData(map);
 
-            LoadLevel();
-        }
+            var human = new Player("Human");
+            human.IsHuman = true;
+            human.OnStartTurn = human.WaitForInput;
 
-        public void LoadLevel()
-        {
+            var ai = new Player("AI");
+
+            LevelData.Players.Add(human);
+            LevelData.Players.Add(ai);
+
+            {
+                (int x, int y)[] positions = { (1, 1), (2, 1), (3, 1), (4, 1) };
+
+                for (int i = 0; i < 4; i++)
+                {
+                    var morty = (Pawn)PawnAtlas.Morty.Clone();
+                    var position = positions[i];
+                    morty.X = position.x;
+                    morty.Y = position.y;
+                    morty.Owner = human;
+                    map.AddAgent(morty);
+                }
+            }
+
+            {
+                (int x, int y)[] positions = { (1, 7), (2, 7), (3, 7), (4, 7) };
+
+                for (int i = 0; i < 4; i++)
+                {
+                    var enemy = (Pawn)PawnAtlas.Gromphlamite.Clone();
+                    var position = positions[i];
+                    enemy.X = position.x;
+                    enemy.Y = position.y;
+                    enemy.Owner = ai;
+                    map.AddAgent(enemy);
+                }
+            }
+
             SceneManager.LoadScene(Scenes.LEVEL);
         }
     }

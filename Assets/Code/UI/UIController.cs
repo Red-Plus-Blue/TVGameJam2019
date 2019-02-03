@@ -52,7 +52,12 @@ namespace Game.Assets
                 return "";
             }
 
-            var description = pawn.Name;
+            var description = String.Format(
+                "Name: {0}\n" +
+                "Owner: {1}",
+                pawn.Name,
+                pawn.Owner.Name
+            );
             return description;
         }
 

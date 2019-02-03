@@ -9,5 +9,6 @@ namespace Game.Assets
     public class PawnAtlas : MonoBehaviour
     {
         public Pawn Morty;
+        public Pawn Gromphlamite;
     }
 }
