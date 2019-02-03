@@ -11,5 +11,7 @@ namespace Game.Assets
     {
         public bool IsLeftCharacter = false;
         public string Text = "";
+        public string Option1 = "";
+        public string Option2 = "";
     }
 }

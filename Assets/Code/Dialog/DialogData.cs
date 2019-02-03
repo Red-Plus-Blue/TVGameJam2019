@@ -9,6 +9,8 @@ namespace Game.Assets
     [Serializable]
     public class DialogData
     {
+        public string ID = "";
+
         public string LeftCharacterName;
         public Sprite LeftCharacterImage;
 

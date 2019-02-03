@@ -22,6 +22,7 @@ namespace Game.Assets
 
         public TileAtlas TileAtlas;
         public PawnAtlas PawnAtlas;
+        public DialogAtlas DialogAtlas;
 
         public User User = new User();
 
@@ -35,6 +36,11 @@ namespace Game.Assets
 
             Instance = this;
             GameObject.DontDestroyOnLoad(gameObject);
+
+            User.MetaData["user_dimension_id"] = "F-351";
+            User.MetaData["commander_dimension_id"] = "R-227";
+            User.MetaData["predecessor_id"] = "D-78";
+            User.MetaData["mission_planet_name"] = "Alpha Centauria Beta-Prime-Delta";
         }
 
         public void StartLevel()

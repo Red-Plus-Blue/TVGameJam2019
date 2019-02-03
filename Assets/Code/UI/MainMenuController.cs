@@ -19,6 +19,8 @@ namespace Game.Assets
 
         public GameObject[] CitadaleParts = new GameObject[0];
 
+        public Dialog Dialog;
+
         private void Awake()
         {
             Instance = this;
@@ -50,7 +52,10 @@ namespace Game.Assets
                 yield return null;
             }
             Title.gameObject.SetActive(false);
-            EnableMenu();
+
+            var intro = GameManager.Instance.DialogAtlas.Dailogs.ToList().Where(dialog => dialog.ID == "special_intro").First();
+
+            Dialog.RunDialog(intro, EnableMenu);
             yield return null;
         }
 
