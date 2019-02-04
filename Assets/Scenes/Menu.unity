@@ -7032,13 +7032,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e73748b1c092ec418df21681866a1ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Grass:
+  Tiles:
+  - ID: grass
+    Name: Grass
     Walkable: 1
     Prefab: {fileID: 7404315273773329837, guid: d7f9e9deb2f747e459832499f894669d,
       type: 3}
-  Mountain:
-    Walkable: 0
-    Prefab: {fileID: 7404315273773329837, guid: 52c709e04ca46e94687cbd6c2ee11b76,
+  - ID: building_1
+    Name: Building
+    Walkable: 1
+    Prefab: {fileID: 3724425379191273547, guid: 5300afe8221f0fa4085bfb06fbae3aec,
       type: 3}
 --- !u!4 &1209106614
 Transform:
@@ -7105,23 +7108,23 @@ MonoBehaviour:
     RightCharacterName: ${user_dimension_id}
     RightCharacterImage: {fileID: 0}
     Segments:
-    - IsLeftCharacter: 0
+    - IsLeftCharacter: 1
       Text: Yo, ${user_dimension_id}. You and I both know that ${predecessor_id} was
         a stand up guy. But if there's anything we can learn form him, it's that you
         shouldn't stand up in front of a dark matter energy bullet.
       Option1: Woo! Promotion! Suck it ${predecessor_id}!
       Option2: He'll always be in our memories.
-    - IsLeftCharacter: 0
+    - IsLeftCharacter: 1
       Text: Couldn't agree more ${user_dimension_id}. You'll be in charge of his Dorky's
         and Richard's from now on...or at least until you die.
       Option1: Can do.
       Option2: Great, as if my own Dorky wasn't enough.
-    - IsLeftCharacter: 0
+    - IsLeftCharacter: 1
       Text: That's the spirit. Now grab Dorky ${user_dimension_id} and get to the
         hangar bay.
       Option1: Do I have to?
       Option2: The galactic police found one of labs didn't they?
-    - IsLeftCharacter: 0
+    - IsLeftCharacter: 1
       Text: Yes. you'll be headed to ${mission_planet_name}. Clear out the hostile
         forces in the area, and try to get know your squad or something. ${commander_dimension_id}
         out.
@@ -12513,13 +12516,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Morty:
-    Name: Morty
+    Name: Dorky
     Prefab: {fileID: 5890380079144478488, guid: 5b17f9cc2553f5e419d573ce85d4860d,
       type: 3}
+    MovePointsMax: 5
+    MovePoints: 5
+    HealthMax: 20
+    Health: 20
+    AttackRange: 1
   Gromphlamite:
-    Name: Gromphlamite
+    Name: Insect
     Prefab: {fileID: 5494963835128428959, guid: f0743d7ee7160e94788f0f0dc7ae4759,
       type: 3}
+    MovePointsMax: 1
+    MovePoints: 1
+    HealthMax: 20
+    Health: 20
+    AttackRange: 1
 --- !u!4 &1387548249
 Transform:
   m_ObjectHideFlags: 0
@@ -17873,6 +17886,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_BackGroundColor.b
       value: 0.122641504
+      objectReference: {fileID: 0}
+    - target: {fileID: 3659994281178129978, guid: 016ef4c927d75bc4ea16bd2a71fa314e,
+        type: 3}
+      propertyPath: ScrollSpeed
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8578001435553152287, guid: 016ef4c927d75bc4ea16bd2a71fa314e, type: 3}

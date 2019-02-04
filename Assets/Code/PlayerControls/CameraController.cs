@@ -6,12 +6,16 @@ namespace Game.Assets
 {
     public class CameraController : MonoBehaviour
     {
+        public Camera Camera;
         public Vector3 LookTarget = Vector3.zero;
 
         public float FollowSpeed = .05f;
         public float Speed          = 5.0f;
         public float InputVertical;
         public float InputHorizontal;
+        public float InputScroll;
+
+        public float ScrollSpeed;
 
         private void Awake()
         {
@@ -31,6 +35,10 @@ namespace Game.Assets
             {
                 gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, LookTarget, FollowSpeed);
             }
+
+            InputScroll = Input.GetAxis("Mouse ScrollWheel");
+
+            Camera.orthographicSize -= InputScroll * Time.deltaTime * ScrollSpeed;
         }
     }
 }

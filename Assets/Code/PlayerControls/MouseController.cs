@@ -9,10 +9,11 @@ namespace Game.Assets
 {
     public class MouseController : MonoBehaviour
     {
-        public GameObject HighlightPrefab;
+        public GameObject SelectorPrefab;
+        public GameObject HighlightMovePrefab;
+        public GameObject HighlightAttackPrefab;
 
-        public GameObject CursorHighlight;
-        public GameObject UnitHighlight;
+        public GameObject Selector;
 
         public Action<NodeData>     OnTerrainChange;
         public Action<Pawn>         OnPawnChange;
@@ -24,12 +25,15 @@ namespace Game.Assets
         protected Action<Point, Pawn, NodeData> _state;
         protected Player _owner;
 
+        protected List<GameObject> _actionGraphics = new List<GameObject>();
+        protected List<ActionInfo> _actionsForSelectedPawn = new List<ActionInfo>();
+
         protected Point _previousPoint = new Point(-1, -1);
+        protected Map<NodeData> _map;
 
         private void Awake()
         {
-            CursorHighlight = GameObject.Instantiate(HighlightPrefab, Vector3.zero, Quaternion.identity);
-            UnitHighlight = GameObject.Instantiate(HighlightPrefab, Vector3.zero, Quaternion.identity);
+            Selector = GameObject.Instantiate(SelectorPrefab, Vector3.zero, Quaternion.identity);
             _state = State_NoUnitSelected;
         }
 
@@ -39,6 +43,8 @@ namespace Game.Assets
             OnPawnChange += UIController.Instance.SetPawnData;
             OnSelectedChange += UIController.Instance.SetSelectedPawn;
             _owner = GameManager.Instance.LevelData.Players.Where(player => player.IsHuman).First();
+            _map = GameManager.Instance.LevelData.Map;
+
         }
 
         private void Update()
@@ -59,7 +65,7 @@ namespace Game.Assets
                 _previousPoint = point;
                 if (isOnMap)
                 {
-                    CursorHighlight.transform.position = new Vector3(point.X, point.Y, -1.0f);
+                    Selector.transform.position = new Vector3(point.X, point.Y, -1.0f);
                     _highlightedTerrain = map.GetData(point);
 
                     var pawns = map.GetAgent(point);
@@ -72,7 +78,7 @@ namespace Game.Assets
                     OnTerrainChange?.Invoke(null);
                 }
 
-                CursorHighlight.SetActive(isOnMap);
+                Selector.SetActive(isOnMap);
                 OnPawnChange?.Invoke(_highlightedPawn);
             }
 
@@ -82,10 +88,51 @@ namespace Game.Assets
             }
         }
 
+        protected IEnumerator ExecuteAction(ActionInfo action, Pawn pawn)
+        {
+            if(action.Prerequisite != null)
+            {
+                yield return StartCoroutine(ExecuteAction(action.Prerequisite, pawn));
+            }
+
+            switch(action.ActionType)
+            {
+                case ActionType.MOVE:
+                    {
+                        var pawnComponent = _selectedUnit.PawnComponent;
+                        var start = new Point(pawn.X, pawn.Y);
+                        var path = _map.GetPath(start, action.Location, _selectedUnit);
+                        _selectedUnit.X = action.Location.X;
+                        _selectedUnit.Y = action.Location.Y;
+                        yield return pawnComponent.Move(path.Select(node => new Vector2(node.X, node.Y)).ToList());
+                        break;
+                    }
+                case ActionType.ATTACK:
+                    {
+                        Debug.Log("Attacking");
+                        break;
+                    }
+            }
+        }
+
+        protected void ShowActions(List<ActionInfo> actions)
+        {
+            actions.ForEach(action =>
+            {
+                var position = new Vector2(action.Location.X, action.Location.Y);
+                var prefab = action.ActionType == ActionType.MOVE ? HighlightMovePrefab : HighlightAttackPrefab;
+                var actionGameObject = GameObject.Instantiate(prefab, position, Quaternion.identity);
+                _actionGraphics.Add(actionGameObject);
+            });
+        }
+
+        protected void HideActions()
+        {
+            _actionGraphics.ForEach(action => { GameObject.Destroy(action); });
+        }
+
         protected void State_NoUnitSelected(Point point, Pawn pawn, NodeData nodeData)
         {
-            var map = GameManager.Instance.LevelData.Map;
-
             if (Input.GetMouseButtonDown(0))
             {
                 if (pawn != null && pawn.Owner == _owner)
@@ -93,27 +140,31 @@ namespace Game.Assets
                     _selectedUnit = pawn;
                     _state = State_UnitSelected;
                     OnSelectedChange?.Invoke(_selectedUnit);
+
+                    var actions = GameManager.Instance.Board.GetActionsFor(_selectedUnit);
+                    ShowActions(actions);
+                    _actionsForSelectedPawn = actions;
                 }
             }
         }
 
         protected void State_UnitSelected(Point point, Pawn pawn, NodeData nodeData)
         {
-            var map = GameManager.Instance.LevelData.Map;
-
             if (Input.GetMouseButtonDown(0))
             {
-                var pawnComponent = _selectedUnit.PawnComponent;
-                var start = new Point((int)pawnComponent.transform.position.x, (int)pawnComponent.transform.position.y);
-                var path = map.GetPath(start, point, _selectedUnit);
-                _selectedUnit.X = point.X;
-                _selectedUnit.Y = point.Y;
+                var action = _actionsForSelectedPawn.Find(actionInfo => {
+                    return actionInfo.Location.X == point.X && actionInfo.Location.Y == point.Y;
+                });
 
-                pawnComponent.Move(path.Select(node => new Vector2(node.X, node.Y)).ToList());
+                if(action != null)
+                {
+                    StartCoroutine(ExecuteAction(action, _selectedUnit));
+                }
 
                 _selectedUnit = null;
                 _state = State_NoUnitSelected;
                 OnSelectedChange?.Invoke(_selectedUnit);
+                HideActions();
             }
         }
     }

@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Assets\Code\Board\Board.cs" />
     <Compile Include="Assets\Code\Board\LevelData.cs" />
+    <Compile Include="Assets\Code\Board\ActionInfo.cs" />
     <Compile Include="Assets\Code\Board\PawnAtlas.cs" />
     <Compile Include="Assets\Code\Board\TileAtlas.cs" />
     <Compile Include="Assets\Code\Dialog\DialogAtlas.cs" />

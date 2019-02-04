@@ -98,11 +98,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45099fd375df3854088a095899090fb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Camera: {fileID: 4425961492233415928}
   LookTarget: {x: 0, y: 0, z: 0}
   FollowSpeed: 0.05
   Speed: 5
   InputVertical: 0
   InputHorizontal: 0
+  InputScroll: 0
+  ScrollSpeed: 100
 --- !u!114 &8578001435553152287
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,4 +121,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HighlightPrefab: {fileID: 7404315273773329837, guid: ae6e8520e3c81f748b42d791d8f6eb86,
     type: 3}
-  HighlightObject: {fileID: 0}
+  CursorHighlight: {fileID: 0}
+  UnitHighlight: {fileID: 0}

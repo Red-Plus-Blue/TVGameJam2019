@@ -35,7 +35,7 @@ namespace Game.Assets
             TerrainText.text = String.Format(
                 "{0}\n" +
                 "Walkable: {1}",
-                data.Prefab.name,
+                data.Name,
                 data.Walkable
             );
         }

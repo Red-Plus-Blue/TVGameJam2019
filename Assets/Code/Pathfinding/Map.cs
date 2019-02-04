@@ -97,20 +97,20 @@ namespace Game.Pathfinding
             return path;
         }
 
-        protected List<Node<T>> GetNeighbors(Node<T> node)
+        public List<Node<T>> GetNeighbors(Point point)
         {
             var neighbors = new List<Node<T>>();
-            for(int xOffset = -1; xOffset < 2; xOffset += 1)
+            for (int xOffset = -1; xOffset < 2; xOffset += 1)
             {
-                for(int yOffset = -1; yOffset < 2; yOffset += 1)
+                for (int yOffset = -1; yOffset < 2; yOffset += 1)
                 {
                     if (xOffset == 0 && yOffset == 0)
                     {
                         continue;
                     }
 
-                    var xTarget = node.X + xOffset;
-                    var yTarget = node.Y + yOffset;
+                    var xTarget = point.X + xOffset;
+                    var yTarget = point.Y + yOffset;
 
                     if ((xTarget >= 0) && (yTarget >= 0) && (xTarget < MaxX) && (yTarget < MaxY))
                     {
@@ -119,6 +119,11 @@ namespace Game.Pathfinding
                 }
             }
             return neighbors;
+        }
+
+        protected List<Node<T>> GetNeighbors(Node<T> node)
+        {
+            return GetNeighbors(new Point(node.X, node.Y));
         }
 
         public List<Node<T>> GetPath(Point from, Point to, Agent<T> agent)
@@ -162,7 +167,10 @@ namespace Game.Pathfinding
 
                 neighbors.ForEach(neighbor =>
                 {
-                    if(agent.CanEnter(neighbor) == false)
+                    var others = GetAgent(new Point(neighbor.X, neighbor.Y));
+                    var containsOther = (others.Count > 0) && (others.Contains(agent) == false);
+
+                    if (agent.CanEnter(neighbor) == false || containsOther)
                     {
                         closedSet.Add(neighbor);
                     }
@@ -185,6 +193,47 @@ namespace Game.Pathfinding
             }
 
             throw new NoPathException();
+        }
+
+        public List<Node<T>> GetTilesInRange(Agent<T> agent, int range)
+        {
+            var currentPosition = _nodes[agent.X, agent.Y];
+            var tiles = new List<Node<T>>();
+            var previousNeighbors = new List<Node<T>>();
+            previousNeighbors.Add(currentPosition);
+
+            for(var currentRange = 1; currentRange <= range; currentRange++)
+            {
+                var neighbors = new List<Node<T>>();
+
+                previousNeighbors.ForEach(node =>
+                {
+                    GetNeighbors(node).ForEach(neighbor => {
+                        var seenBefore = neighbors.Contains(neighbor) || tiles.Contains(neighbor);
+
+                        if (seenBefore == false)
+                        {
+                            neighbors.Add(neighbor);
+                        }
+                    });
+                });
+
+                previousNeighbors.Clear();
+
+                neighbors.ForEach(neighbor =>
+                {
+                    var others = GetAgent(new Point(neighbor.X, neighbor.Y));
+                    var containsOther = (others.Count > 0) && (others.Contains(agent) == false);
+
+                    if (agent.CanEnter(neighbor) && containsOther == false)
+                    {
+                        tiles.Add(neighbor);
+                        previousNeighbors.Add(neighbor);
+                    }
+                });
+            }
+
+            return tiles;
         }
     }
 }

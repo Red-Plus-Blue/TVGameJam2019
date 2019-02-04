@@ -11,9 +11,9 @@ namespace Game.Assets
         public float StepSpeed          = 1.0f;
         public float TimeBetweenSteps   = 1.0f;
 
-        public void Move(List<Vector2> path)
+        public Coroutine Move(List<Vector2> path)
         {
-            StartCoroutine(Move_Coroutine(path));
+            return StartCoroutine(Move_Coroutine(path));
         }
 
         public IEnumerator Move_Coroutine(List<Vector2> path)
@@ -36,6 +36,12 @@ namespace Game.Assets
 
                 yield return new WaitForSeconds(TimeBetweenSteps);
             }
+
+            gameObject.transform.position = new Vector3(
+                Mathf.Round(gameObject.transform.position.x),
+                Mathf.Round(gameObject.transform.position.y),
+                gameObject.transform.position.z
+            );
 
             yield return null;
         }

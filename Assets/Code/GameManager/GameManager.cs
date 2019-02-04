@@ -45,16 +45,15 @@ namespace Game.Assets
 
         public void StartLevel()
         {
-            var map = new Map<NodeData>(10, 10, TileAtlas.Grass);
+            var grass = TileAtlas.Tiles.First(tile => tile.ID == "grass");
+            var building = TileAtlas.Tiles.First(tile => tile.ID == "building_1");
 
-            for (int i = 0; i < 9; i++)
-            {
-                var position1 = new Point(i, 3);
-                map.SetData(position1, TileAtlas.Mountain);
+            var map = new Map<NodeData>(10, 10, grass);
 
-                var position2 = new Point(1 + i, 6);
-                map.SetData(position2, TileAtlas.Mountain);
-            }
+            map.SetData(new Point(3, 3), building);
+            map.SetData(new Point(5, 6), building);
+            map.SetData(new Point(7, 3), building);
+            map.SetData(new Point(2, 8), building);
 
             LevelData = new LevelData(map);
 

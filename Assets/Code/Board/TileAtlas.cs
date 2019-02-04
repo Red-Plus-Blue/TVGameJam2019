@@ -8,7 +8,6 @@ namespace Game.Assets
 {
     public class TileAtlas : MonoBehaviour
     {
-        public NodeData Grass;
-        public NodeData Mountain;
+        public NodeData[] Tiles = new NodeData[0];
     }
 }

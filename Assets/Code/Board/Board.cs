@@ -44,5 +44,72 @@ namespace Game.Assets
             _turnManager.OnTurnStart = (player, callback) => { Debug.Log("It is " + player.Name + "'s turn"); callback(); };
             _turnManager.NextRound();
         }
+
+        public List<ActionInfo> GetActionsFor(Pawn pawn)
+        {
+            var actions = new List<ActionInfo>();
+
+            // Determine Moves
+            var moves = new List<ActionInfo>();
+
+            if(pawn.MovePoints < 1)
+            {
+                return moves;
+            }
+
+            var nodesInRange = _map.GetTilesInRange(pawn, pawn.MovePoints);
+
+            moves = nodesInRange.Select(node => {
+                return  new ActionInfo(
+                    null,
+                    null,
+                    new Point(node.X, node.Y),
+                    ActionType.MOVE
+                );
+            }).ToList();
+
+            moves.ForEach(move => actions.Add(move));
+
+            // Determine Attacks
+            var attacks = new List<ActionInfo>();
+
+            var enemies = _map.GetAgents()
+               .Select(agent => (Pawn)agent)
+               .Where(otherPawn => {
+                   return otherPawn.Owner != pawn.Owner;
+               }).ToList();
+
+            int Distance(int x1, int y1, int x2, int y2)
+            {
+                var xDistance = Math.Abs(x2 - x1);
+                var yDistance = Math.Abs(y2 - y1);
+                return Math.Max(xDistance, yDistance);
+            }
+
+            moves.ForEach(move =>
+            {
+                enemies.ForEach(enemy =>
+                {
+                    var distance = Distance(move.Location.X, move.Location.Y, enemy.X, enemy.Y);
+                    var seenBefore = attacks.Where(attack => {
+                        return (attack.Location.X == enemy.X) && (attack.Location.Y == enemy.Y); 
+                    }).ToList().Count > 0;
+
+                    if(distance <= pawn.AttackRange && seenBefore == false)
+                    {
+                        attacks.Add(new ActionInfo(
+                            move,
+                            null,
+                            new Point(enemy.X, enemy.Y),
+                            ActionType.ATTACK
+                        ));
+                    }
+                });
+                
+            });
+
+            attacks.ForEach(attack => actions.Add(attack));
+            return actions;
+        }
     }
 }

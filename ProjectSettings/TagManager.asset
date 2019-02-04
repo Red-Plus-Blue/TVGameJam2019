@@ -41,3 +41,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Terrain
+    uniqueID: 254978979
+    locked: 0
+  - name: Deco
+    uniqueID: 131918205
+    locked: 0
+  - name: Highlight-Low
+    uniqueID: 4035872997
+    locked: 0
+  - name: Unit
+    uniqueID: 2356382661
+    locked: 0
+  - name: Highlight-High
+    uniqueID: 2950581825
+    locked: 0
+  - name: Selector
+    uniqueID: 3157348583
+    locked: 0
