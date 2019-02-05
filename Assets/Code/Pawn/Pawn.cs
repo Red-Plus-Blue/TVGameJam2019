@@ -25,6 +25,7 @@ namespace Game.Assets
         public int Damage           = 1;
         public int AttackRange      = 1;
         public int Attack           = 1;
+        public bool UseDimensionInName = true;
 
         public override bool CanEnter(Node<NodeData> node)
         {
@@ -51,7 +52,20 @@ namespace Game.Assets
             pawn.Defence = Defence;
             pawn.Damage = Damage;
             pawn.Attack = Attack;
+            pawn.UseDimensionInName = UseDimensionInName;
             return pawn;
+        }
+
+        public string GetFullName()
+        {
+            if(UseDimensionInName)
+            {
+                return string.Format("{0} {1}", Name, Dimension);
+            }
+            else
+            {
+                return Name;
+            }
         }
 
     }

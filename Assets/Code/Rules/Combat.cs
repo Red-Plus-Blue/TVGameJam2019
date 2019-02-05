@@ -36,5 +36,4 @@ namespace Game.Assets
             return damage;
         }
     }
-
 }

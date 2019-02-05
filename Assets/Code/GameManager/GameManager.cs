@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -29,6 +30,9 @@ namespace Game.Assets
         public User User = new User();
         public Multiverse Multiverse = Multiverse.Generate();
 
+        public Animator Transition;
+        public GameObject TransitionRoot;
+
         private void Awake()
         {
             if(Instance != null)
@@ -39,6 +43,7 @@ namespace Game.Assets
 
             Instance = this;
             GameObject.DontDestroyOnLoad(gameObject);
+            GameObject.DontDestroyOnLoad(TransitionRoot);
 
             var playerDimension = Multiverse.Dimensions[0];
             var commanderDimension = Multiverse.Dimensions[1];
@@ -109,7 +114,18 @@ namespace Game.Assets
                 }
             }
 
-            SceneManager.LoadScene(Scenes.LEVEL);
+            StartCoroutine(Transition_Coroutine(Scenes.LEVEL));
+        }
+
+        public IEnumerator Transition_Coroutine(int target)
+        {
+            MainMenuController.Instance.DisableMenu();
+            Transition.SetTrigger("FadeIn");
+            yield return new WaitForSeconds(1.0f);
+            SceneManager.LoadScene(target);
+            Transition.SetTrigger("FadeOut");
+            yield return new WaitForSeconds(1.0f);
         }
     }
+
 }

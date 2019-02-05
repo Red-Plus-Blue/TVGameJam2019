@@ -125,21 +125,21 @@ namespace Game.Assets
                     }
                 case ActionType.ATTACK:
                     {
-                        var combatResult = Combat.Attack(pawn, action.Target);
-                        action.Target.Health -= combatResult.Damage;
+                        var attacker = pawn;
+                        var defender = action.Target;
+                        var board = GameManager.Instance.Board;
 
-                        GameManager.Instance.Board.DeathCheck(action.Target);
+                        yield return board.StartCoroutine(board.Attack(attacker, defender));
+                        GameManager.Instance.Board.DeathCheck(defender);
 
-                        if (action.Target.IsDead())
+                        // If the target died, do nothing
+                        if (defender.IsDead())
                         {
                             break;
                         }
 
-                        var retaliateResult = Combat.Attack(action.Target, pawn);
-                        pawn.Health -= retaliateResult.Damage;
-
-                        GameManager.Instance.Board.DeathCheck(pawn);
-
+                        yield return board.StartCoroutine(board.Attack(defender, attacker));
+                        GameManager.Instance.Board.DeathCheck(attacker);
                         break;
                     }
             }

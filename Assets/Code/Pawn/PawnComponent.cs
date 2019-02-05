@@ -11,6 +11,17 @@ namespace Game.Assets
         public float StepSpeed          = 1.0f;
         public float TimeBetweenSteps   = 1.0f;
 
+        public Coroutine Attack(Vector2 position)
+        {
+            var attackPath = new List<Vector2>()
+            {
+                position,
+                gameObject.transform.position
+            };
+
+            return StartCoroutine(Move_Coroutine(attackPath));
+        }
+
         public Coroutine Move(List<Vector2> path)
         {
             return StartCoroutine(Move_Coroutine(path));

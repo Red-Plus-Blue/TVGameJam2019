@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -83,6 +84,7 @@ namespace Game.Assets
                 pawn.Y = -1;
                 _map.RemoveAgent(pawn);
 
+                UIController.Instance.LogMessage(string.Format("{0} has been slain!", pawn.GetFullName()));
             }
         }
 
@@ -152,6 +154,26 @@ namespace Game.Assets
 
             attacks.ForEach(attack => actions.Add(attack));
             return actions;
+        }
+
+        public IEnumerator Attack(Pawn attacker, Pawn defender)
+        {
+            // Animate Attack
+            yield return attacker.PawnComponent.Attack(new Vector2(defender.X, defender.Y));
+
+            // Determine result
+            var combatResult = Combat.Attack(attacker, defender);
+            defender.Health -= combatResult.Damage;
+
+            // Print result
+            var attackString = string.Format(
+                "{0} attacks {1} for {2} damage. (Roll: {3})",
+                attacker.GetFullName(),
+                defender.GetFullName(),
+                combatResult.Damage,
+                combatResult.LuckRoll
+            );
+            UIController.Instance.LogMessage(attackString);
         }
     }
 }

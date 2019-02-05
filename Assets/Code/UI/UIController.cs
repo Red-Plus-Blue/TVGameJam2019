@@ -16,6 +16,7 @@ namespace Game.Assets
         public Text DefenderDamage;
         public TerrainInfo TerrainInfo;
         public GameObject[] VsPawnObjects = new GameObject[0];
+        public Log Log;
 
         private void Awake()
         {
@@ -26,6 +27,11 @@ namespace Game.Assets
         public void SetPawnData(Pawn pawn)
         {
             SelectedPawnInfo.Show(pawn);
+        }
+
+        public void LogMessage(string message)
+        {
+            Log.LogMessage(message);
         }
 
         public void SetTerrainData(NodeData data)

@@ -93,5 +93,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59ebe30d19200948945663bb5faa976, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StepSpeed: 0.5
-  TimeBetweenSteps: 0.2
+  StepSpeed: 0.1
+  TimeBetweenSteps: 0.1
