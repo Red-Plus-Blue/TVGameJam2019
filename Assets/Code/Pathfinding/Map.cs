@@ -41,6 +41,11 @@ namespace Game.Pathfinding
             _agents.Add(agent);
         }
 
+        public void RemoveAgent(Agent<T> agent)
+        {
+            _agents.Remove(agent);
+        }
+
         public List<Agent<T>> GetAgent(Point point)
         {
             return _agents.Where(agent => { return (agent.X == point.X) && (agent.Y == point.Y); }).ToList();

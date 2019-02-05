@@ -18,6 +18,7 @@ namespace Game.Assets
         public Action Exectue;
         public Point Location;
         public ActionType ActionType;
+        public Pawn Target;
 
         public ActionInfo(ActionInfo prerequisite, Action exectue, Point location, ActionType type)
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Game.Pathfinding;
+using Game.MultiverseData;
 
 namespace Game.Assets
 {
@@ -23,8 +24,10 @@ namespace Game.Assets
         public TileAtlas TileAtlas;
         public PawnAtlas PawnAtlas;
         public DialogAtlas DialogAtlas;
+        public FXAtlas FXAtlas;
 
         public User User = new User();
+        public Multiverse Multiverse = Multiverse.Generate();
 
         private void Awake()
         {
@@ -37,10 +40,15 @@ namespace Game.Assets
             Instance = this;
             GameObject.DontDestroyOnLoad(gameObject);
 
-            User.MetaData["user_dimension_id"] = "F-351";
-            User.MetaData["commander_dimension_id"] = "R-227";
-            User.MetaData["predecessor_id"] = "D-78";
-            User.MetaData["mission_planet_name"] = "Alpha Centauria Beta-Prime-Delta";
+            var playerDimension = Multiverse.Dimensions[0];
+            var commanderDimension = Multiverse.Dimensions[1];
+            var predecessorDimension = Multiverse.Dimensions[2];
+            predecessorDimension.Characters.Find(character => character.Name == "Rich").Status = CharacterStatus.KIA;
+
+            User.MetaData["user_dimension_id"] = playerDimension.ID;
+            User.MetaData["commander_dimension_id"] = predecessorDimension.ID;
+            User.MetaData["predecessor_id"] = commanderDimension.ID;
+            User.MetaData["mission_planet_name"] = "Alpha Centauri Beta-Prime-Delta";
         }
 
         public void StartLevel()
@@ -65,18 +73,22 @@ namespace Game.Assets
 
             LevelData.Players.Add(human);
             LevelData.Players.Add(ai);
+            LevelData.Mission = new KillHostilesMission(human);
 
             {
                 (int x, int y)[] positions = { (1, 1), (2, 1), (3, 1), (4, 1) };
+                var dimensions = Multiverse.Dimensions.Take(4).ToList();
 
                 for (int i = 0; i < 4; i++)
                 {
-                    var morty = (Pawn)PawnAtlas.Morty.Clone();
+                    var dorky = (Pawn)PawnAtlas.Morty.Clone();
                     var position = positions[i];
-                    morty.X = position.x;
-                    morty.Y = position.y;
-                    morty.Owner = human;
-                    map.AddAgent(morty);
+                    dorky.X = position.x;
+                    dorky.Y = position.y;
+                    dorky.Owner = human;
+                    dorky.Status = "Scared";
+                    dorky.Dimension = dimensions[i].ID;
+                    map.AddAgent(dorky);
                 }
             }
 
@@ -90,6 +102,9 @@ namespace Game.Assets
                     enemy.X = position.x;
                     enemy.Y = position.y;
                     enemy.Owner = ai;
+                    enemy.Dimension = "F-351";
+                    enemy.Status = "Vigilant";
+                    enemy.Attack += (i * 10);
                     map.AddAgent(enemy);
                 }
             }

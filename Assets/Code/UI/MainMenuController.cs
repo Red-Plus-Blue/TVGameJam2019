@@ -20,6 +20,7 @@ namespace Game.Assets
         public GameObject[] CitadaleParts = new GameObject[0];
 
         public Dialog Dialog;
+        public Archives Archives;
 
         private void Awake()
         {
@@ -86,6 +87,12 @@ namespace Game.Assets
         {
             switch (menu)
             {
+                case MainMenuType.CREDITS:
+                    {
+                        DisableMenu();
+                        Archives.Show(EnableMenu);
+                        break;
+                    }
                 case MainMenuType.MISSION: { GameManager.Instance.StartLevel(); break; }
                 case MainMenuType.QUIT: { Application.Quit(); break; }
             }
@@ -99,8 +106,8 @@ namespace Game.Assets
 
         public void MenuCredits()
         {
-            MenuTitle.text = "Archives (Credits)";
-            MenuDescription.text = "Consult the archives to find out who is responsible for this.";
+            MenuTitle.text = "Archives (Instructions & Credits)";
+            MenuDescription.text = "Consult the archives to find out who is responsible for this. You might also find out how to play.";
         }
 
         public void MenuMission()

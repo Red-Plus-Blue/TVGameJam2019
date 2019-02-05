@@ -9,6 +9,7 @@ namespace Game.Assets
     public class Board : MonoBehaviour
     {
         protected Map<NodeData> _map;
+        protected LevelData _levelData;
 
         protected Dictionary<Node<NodeData>, GameObject> _nodesToGameObejcts = new Dictionary<Node<NodeData>, GameObject>();
 
@@ -38,11 +39,51 @@ namespace Game.Assets
 
         private void Start()
         {
-            var players = GameManager.Instance.LevelData.Players;
+            _levelData = GameManager.Instance.LevelData;
+            var players = _levelData.Players;
+
             _turnManager = new TurnManager(players);
             _turnManager.OnRoundStart = (round, callback) => { Debug.Log("Starting round: " + round); callback(); };
-            _turnManager.OnTurnStart = (player, callback) => { Debug.Log("It is " + player.Name + "'s turn"); callback(); };
+            _turnManager.OnTurnStart += OnTurnStart;
             _turnManager.NextRound();
+        }
+
+        public void OnTurnStart(Player player, Action turnManagerCallback)
+        {
+            var missionComplete = _levelData.Mission.CheckMissionComplete(_map);
+
+            if(missionComplete)
+            {
+                Debug.Log("Victory");
+                return;
+            }
+
+            var playerDefeated = _levelData.Mission.CheckPlayerDefated(_map);
+
+            if(playerDefeated)
+            {
+                Debug.Log("Defeat");
+                return;
+            }
+
+            turnManagerCallback();
+        }
+
+        public void DeathCheck(Pawn pawn)
+        {
+            if(pawn.IsDead())
+            {
+                var position = new Vector2(pawn.X, pawn.Y);
+                var roll = UnityEngine.Random.Range(0, 4);
+                var orientation = Quaternion.Euler(0.0f, 0.0f, roll * 90);
+                GameObject.Instantiate(GameManager.Instance.FXAtlas.Blood, position, orientation);
+
+                GameObject.Destroy(pawn.PawnComponent.gameObject);
+                pawn.X = -1;
+                pawn.Y = -1;
+                _map.RemoveAgent(pawn);
+
+            }
         }
 
         public List<ActionInfo> GetActionsFor(Pawn pawn)
@@ -97,12 +138,13 @@ namespace Game.Assets
 
                     if(distance <= pawn.AttackRange && seenBefore == false)
                     {
-                        attacks.Add(new ActionInfo(
+                        var action = new ActionInfo(
                             move,
                             null,
                             new Point(enemy.X, enemy.Y),
-                            ActionType.ATTACK
-                        ));
+                            ActionType.ATTACK);
+                        action.Target = enemy;
+                        attacks.Add(action);
                     }
                 });
                 

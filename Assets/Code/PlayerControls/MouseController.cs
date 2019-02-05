@@ -79,7 +79,23 @@ namespace Game.Assets
                 }
 
                 Selector.SetActive(isOnMap);
-                OnPawnChange?.Invoke(_highlightedPawn);
+               
+                if(_highlightedPawn == null)
+                {
+                    UIController.Instance.HideVsPawn();
+                }
+
+                if(_selectedUnit == null)
+                {
+                    OnPawnChange?.Invoke(_highlightedPawn);
+                }
+                else if(_highlightedPawn != null)
+                {
+                    if (_highlightedPawn.Owner != _owner)
+                    {
+                        UIController.Instance.SetVsPawnData(_selectedUnit, _highlightedPawn);
+                    }
+                }
             }
 
             if (isOnMap)
@@ -109,7 +125,21 @@ namespace Game.Assets
                     }
                 case ActionType.ATTACK:
                     {
-                        Debug.Log("Attacking");
+                        var combatResult = Combat.Attack(pawn, action.Target);
+                        action.Target.Health -= combatResult.Damage;
+
+                        GameManager.Instance.Board.DeathCheck(action.Target);
+
+                        if (action.Target.IsDead())
+                        {
+                            break;
+                        }
+
+                        var retaliateResult = Combat.Attack(action.Target, pawn);
+                        pawn.Health -= retaliateResult.Damage;
+
+                        GameManager.Instance.Board.DeathCheck(pawn);
+
                         break;
                     }
             }
@@ -164,6 +194,8 @@ namespace Game.Assets
                 _selectedUnit = null;
                 _state = State_NoUnitSelected;
                 OnSelectedChange?.Invoke(_selectedUnit);
+
+                UIController.Instance.HideVsPawn();
                 HideActions();
             }
         }

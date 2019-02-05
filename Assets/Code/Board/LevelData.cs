@@ -10,6 +10,7 @@ namespace Game.Assets
     {
         public Map<NodeData> Map { get; set; }
         public List<Player> Players { get; set; } = new List<Player>();
+        public Mission Mission { get; set; }
 
         public LevelData(Map<NodeData> map)
         {

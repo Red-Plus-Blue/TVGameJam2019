@@ -44,6 +44,9 @@ TagManager:
   - name: Terrain
     uniqueID: 254978979
     locked: 0
+  - name: FX-Ground
+    uniqueID: 2167075871
+    locked: 0
   - name: Deco
     uniqueID: 131918205
     locked: 0

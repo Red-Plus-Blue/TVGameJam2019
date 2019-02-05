@@ -10,56 +10,61 @@ namespace Game.Assets
     {
         public static UIController Instance;
 
-        public Text TerrainText;
-        public Text PawnText;
-        public Text SelectedText;
+        public PawnInfo SelectedPawnInfo;
+        public PawnInfo VsPawnInfo;
+        public Text AttackerDamage;
+        public Text DefenderDamage;
+        public TerrainInfo TerrainInfo;
+        public GameObject[] VsPawnObjects = new GameObject[0];
 
         private void Awake()
         {
             Instance = this;
+            HideVsPawn();
         }
 
         public void SetPawnData(Pawn pawn)
         {
-            PawnText.text = GetPawnDescription(pawn);
+            SelectedPawnInfo.Show(pawn);
         }
 
         public void SetTerrainData(NodeData data)
         {
             if(data == null)
             {
-                TerrainText.text = "";
                 return;
             }
-
-            TerrainText.text = String.Format(
-                "{0}\n" +
-                "Walkable: {1}",
-                data.Name,
-                data.Walkable
-            );
+            TerrainInfo.Show(data);
         }
 
         public void SetSelectedPawn(Pawn pawn)
         {
-            SelectedText.text = GetPawnDescription(pawn);
+            SelectedPawnInfo.Show(pawn);
         }
 
-        protected string GetPawnDescription(Pawn pawn)
+        public void SetVsPawnData(Pawn selected, Pawn vs)
         {
-            if (pawn == null)
+            if(vs == null || selected == null)
             {
-                return "";
+                HideVsPawn();
+                return;
             }
 
-            var description = String.Format(
-                "Name: {0}\n" +
-                "Owner: {1}",
-                pawn.Name,
-                pawn.Owner.Name
-            );
-            return description;
+            AttackerDamage.text = Combat.Damage(selected.Attack, vs.Defence, selected.Damage, 50).ToString();
+            DefenderDamage.text = Combat.Damage(vs.Attack, selected.Defence, vs.Damage, 50).ToString();
+
+            ShowVsPawn();
+            VsPawnInfo.Show(vs);
         }
 
+        public void ShowVsPawn()
+        {
+            VsPawnObjects.ToList().ForEach(element => element.SetActive(true));
+        }
+
+        public void HideVsPawn()
+        {
+            VsPawnObjects.ToList().ForEach(element => element.SetActive(false));
+        }
     }
 }
