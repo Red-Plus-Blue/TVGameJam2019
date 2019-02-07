@@ -111,26 +111,22 @@ namespace Game.Assets
                 yield return StartCoroutine(ExecuteAction(action.Prerequisite, pawn));
             }
 
-            switch(action.ActionType)
+            var board = GameManager.Instance.Board;
+
+            switch (action.ActionType)
             {
                 case ActionType.MOVE:
                     {
-                        var pawnComponent = _selectedUnit.PawnComponent;
-                        var start = new Point(pawn.X, pawn.Y);
-                        var path = _map.GetPath(start, action.Location, _selectedUnit);
-                        _selectedUnit.X = action.Location.X;
-                        _selectedUnit.Y = action.Location.Y;
-                        yield return pawnComponent.Move(path.Select(node => new Vector2(node.X, node.Y)).ToList());
+                        yield return board.StartCoroutine(board.Move(_selectedUnit, action));
                         break;
                     }
                 case ActionType.ATTACK:
                     {
                         var attacker = pawn;
                         var defender = action.Target;
-                        var board = GameManager.Instance.Board;
 
                         yield return board.StartCoroutine(board.Attack(attacker, defender));
-                        GameManager.Instance.Board.DeathCheck(defender);
+                        board.DeathCheck(defender);
 
                         // If the target died, do nothing
                         if (defender.IsDead())
@@ -139,7 +135,7 @@ namespace Game.Assets
                         }
 
                         yield return board.StartCoroutine(board.Attack(defender, attacker));
-                        GameManager.Instance.Board.DeathCheck(attacker);
+                        board.DeathCheck(attacker);
                         break;
                     }
             }

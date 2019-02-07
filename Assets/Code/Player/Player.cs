@@ -2,20 +2,16 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Game.Assets
 {
-    public class Player
+    public class Player : MonoBehaviour
     {
         public string Name { get; set; } = "Player";
         public bool IsHuman { get; set; } = false;
         public Action OnStartTurn { get; set; }
         protected Action _onEndTurn { get; set; }
-
-        public Player(string name)
-        {
-            Name = name;
-        }
 
         public void TakeTurn(Action onEndTurn)
         {
@@ -37,7 +33,7 @@ namespace Game.Assets
 
         public void WaitForInput()
         {
-            // Do nothing
+            // Do nothing...
         }
     }
 }

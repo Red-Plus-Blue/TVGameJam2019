@@ -175,5 +175,15 @@ namespace Game.Assets
             );
             UIController.Instance.LogMessage(attackString);
         }
+
+        public IEnumerator Move(Pawn selectedUnit, ActionInfo action)
+        {
+            var pawnComponent = selectedUnit.PawnComponent;
+            var start = new Point(selectedUnit.X, selectedUnit.Y);
+            var path = _map.GetPath(start, action.Location, selectedUnit);
+            selectedUnit.X = action.Location.X;
+            selectedUnit.Y = action.Location.Y;
+            yield return pawnComponent.Move(path.Select(node => new Vector2(node.X, node.Y)).ToList());
+        }
     }
 }

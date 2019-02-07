@@ -19,6 +19,9 @@ namespace Game.Assets
 
         public static GameManager Instance { get; set; }
 
+        public GameObject PlayerPrefab;
+        public GameObject AIPrefab;
+
         public LevelData LevelData { get; set; }
         public Board Board { get; set; }
 
@@ -70,11 +73,18 @@ namespace Game.Assets
 
             LevelData = new LevelData(map);
 
-            var human = new Player("Human");
+            var humanGameObject = GameObject.Instantiate(PlayerPrefab, gameObject.transform);
+            var human = humanGameObject.GetComponent<Player>();
+            human.Name = "Citadel of Riches";
+
             human.IsHuman = true;
             human.OnStartTurn = human.WaitForInput;
 
-            var ai = new Player("AI");
+            var aiGameObject = GameObject.Instantiate(AIPrefab, gameObject.transform);
+            var ai = aiGameObject.GetComponent<AI>();
+            ai.Name = "The Galactic Police";
+
+            ai.OnStartTurn = ai.Execute;
 
             LevelData.Players.Add(human);
             LevelData.Players.Add(ai);
