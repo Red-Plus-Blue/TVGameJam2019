@@ -16,10 +16,18 @@ namespace Game.Assets
 
         protected TurnManager _turnManager;
 
+        protected List<Point> _remainingObjectives = new List<Point>();
+
+        public GameObject CanMoveHighlightPrefab;
+        public GameObject ObjectHighlightPrefab;
+
+        protected List<GameObject> _objectiveHighlights = new List<GameObject>();
+
         private void Awake()
         {
             GameManager.Instance.Board = this;
             _map = GameManager.Instance.LevelData.Map;
+            _levelData = GameManager.Instance.LevelData;
 
             _map.GetNodes().ForEach(node =>
             {
@@ -36,16 +44,30 @@ namespace Game.Assets
                 var pawnComponent = pawnObject.GetComponent<PawnComponent>();
                 pawn.PawnComponent = pawnComponent;
             });
+
+            _levelData.Objectives.ForEach(objective => _remainingObjectives.Add(new Point(objective.X, objective.Y)));
+            _remainingObjectives.ForEach(objective =>
+            {
+                var position = new Vector2(objective.X, objective.Y);
+                var objectHighlightObject = GameObject.Instantiate(ObjectHighlightPrefab, position, Quaternion.identity);
+                _objectiveHighlights.Add(objectHighlightObject);
+            });
         }
 
         private void Start()
         {
-            _levelData = GameManager.Instance.LevelData;
             var players = _levelData.Players;
 
             _turnManager = new TurnManager(players);
             _turnManager.OnRoundStart = (round, callback) => { Debug.Log("Starting round: " + round); callback(); };
             _turnManager.OnTurnStart += OnTurnStart;
+
+            StartCoroutine(WaitAndStartTurn());
+        }
+
+        protected IEnumerator WaitAndStartTurn()
+        {
+            yield return new WaitForSeconds(.1f);
             _turnManager.NextRound();
         }
 
@@ -67,6 +89,21 @@ namespace Game.Assets
                 return;
             }
 
+            if(player.IsHuman)
+            {
+                var map = GameManager.Instance.LevelData.Map;
+                var pawns = map
+                    .GetAgents()
+                    .Select(agent => (Pawn)agent)
+                    .Where(pawn => pawn.Owner == player)
+                    .ToList();
+
+                pawns.ForEach(pawn =>
+                {
+                    pawn.PawnComponent.SpawnCanMoveHighlight(CanMoveHighlightPrefab);
+                });
+            }
+            
             turnManagerCallback();
         }
 

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Game.Pathfinding;
 
 namespace Game.Assets
@@ -12,6 +13,8 @@ namespace Game.Assets
         public GameObject SelectorPrefab;
         public GameObject HighlightMovePrefab;
         public GameObject HighlightAttackPrefab;
+
+        public Button EndTurnButton;
 
         public GameObject Selector;
 
@@ -31,6 +34,8 @@ namespace Game.Assets
         protected Point _previousPoint = new Point(-1, -1);
         protected Map<NodeData> _map;
 
+        protected bool _allowInput;
+
         private void Awake()
         {
             Selector = GameObject.Instantiate(SelectorPrefab, Vector3.zero, Quaternion.identity);
@@ -43,17 +48,28 @@ namespace Game.Assets
             OnPawnChange += UIController.Instance.SetPawnData;
             OnSelectedChange += UIController.Instance.SetSelectedPawn;
             _owner = GameManager.Instance.LevelData.Players.Where(player => player.IsHuman).First();
+            _owner.OnStartTurn += OnStartTurn;
             _map = GameManager.Instance.LevelData.Map;
 
         }
 
+        public void OnStartTurn()
+        {
+            _allowInput = true;
+            EndTurnButton.interactable = true;
+        }
+
+        public void Button_EndTurn()
+        {
+            EndTurnButton.interactable = false;
+            _allowInput = false;
+            _selectedUnit = null;
+            HideActions();
+            _owner.EndTurn();
+        }
+
         private void Update()
         {
-            if(Input.GetMouseButtonDown(1))
-            {
-                _owner.EndTurn();
-            }
-
             var hoverPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var point = new Point((int)Mathf.Round(hoverPosition.x), (int)Mathf.Round(hoverPosition.y));
 
@@ -98,7 +114,7 @@ namespace Game.Assets
                 }
             }
 
-            if (isOnMap)
+            if (isOnMap && _allowInput)
             {
                 _state(point, _highlightedPawn, _highlightedTerrain);
             }
@@ -112,12 +128,14 @@ namespace Game.Assets
             }
 
             var board = GameManager.Instance.Board;
+            pawn.CanMove = false;
 
             switch (action.ActionType)
             {
                 case ActionType.MOVE:
                     {
-                        yield return board.StartCoroutine(board.Move(_selectedUnit, action));
+                        pawn.PawnComponent.HideCanMove();
+                        yield return board.StartCoroutine(board.Move(pawn, action));
                         break;
                     }
                 case ActionType.ATTACK:
@@ -161,7 +179,7 @@ namespace Game.Assets
         {
             if (Input.GetMouseButtonDown(0))
             {
-                if (pawn != null && pawn.Owner == _owner)
+                if (pawn != null && pawn.Owner == _owner && pawn.CanMove)
                 {
                     _selectedUnit = pawn;
                     _state = State_UnitSelected;

@@ -11,6 +11,27 @@ namespace Game.Assets
         public float StepSpeed          = 1.0f;
         public float TimeBetweenSteps   = 1.0f;
 
+        protected GameObject _canMoveHighlight;
+
+        public void SpawnCanMoveHighlight(GameObject prefab)
+        {
+            _canMoveHighlight = GameObject.Instantiate(prefab, gameObject.transform.position, Quaternion.identity);
+            _canMoveHighlight.transform.parent = gameObject.transform;
+        }
+
+        public void HideCanMove()
+        {
+            if (_canMoveHighlight)
+            {
+                GameObject.Destroy(_canMoveHighlight);
+            }
+        }
+
+        public void OnTurnEnd()
+        {
+            HideCanMove();
+        }
+
         public Coroutine Attack(Vector2 position)
         {
             var attackPath = new List<Vector2>()

@@ -90,6 +90,10 @@ namespace Game.Assets
             LevelData.Players.Add(ai);
             LevelData.Mission = new KillHostilesMission(human);
 
+            LevelData.Objectives.Add(new Point(3, 3));
+            LevelData.Objectives.Add(new Point(5, 6));
+            LevelData.Objectives.Add(new Point(7, 3));
+
             {
                 (int x, int y)[] positions = { (1, 1), (2, 1), (3, 1), (4, 1) };
                 var dimensions = Multiverse.Dimensions.Take(4).ToList();

@@ -35,6 +35,7 @@ namespace Game.Assets
 
         public void NextTurn()
         {
+            EndTurn();
             if(_playersInTurn.Count < 1)
             {
                 NextRound();
@@ -49,7 +50,29 @@ namespace Game.Assets
 
         protected void StartTurn()
         {
+            var map = GameManager.Instance.LevelData.Map;
+            var pawns = map
+                .GetAgents()
+                .Select(agent => (Pawn)agent)
+                .Where(pawn => pawn.Owner == _activePlayer)
+                .ToList();
+
+            pawns.ForEach(pawn =>
+            {
+                pawn.CanMove = true;
+            });
+
             _activePlayer.TakeTurn(NextTurn);
+        }
+
+        protected void EndTurn()
+        {
+            var map = GameManager.Instance.LevelData.Map;
+            var pawns = map.GetAgents().Select(agent => (Pawn)agent).ToList();
+            pawns.ForEach(pawn => {
+                pawn.PawnComponent.OnTurnEnd();
+                pawn.CanMove = false;
+            });
         }
     }
 }
